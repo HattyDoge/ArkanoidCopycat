@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Threading;
 
 namespace ArkanoidCopycat
 {
@@ -31,7 +32,14 @@ namespace ArkanoidCopycat
         Rectangle barCollision;
         int barSpeed;
         bool check = false;
-
+        
+        public void Restart()
+        {
+            barCollision.X = _graphics.PreferredBackBufferWidth / 2;
+            Thread.Sleep(10000);
+            ballCollision.X = barCollision.X+ballTexture.Width;
+            ballCollision.Y = barCollision.Y;
+        }
         SpriteFont spriteFont;
         public Game1()
         {
@@ -52,8 +60,8 @@ namespace ArkanoidCopycat
             _graphics.ApplyChanges();
             ballMovement.Y = ballSpeed;
 
-            initialBallPosX = _graphics.PreferredBackBufferWidth / 2;
-            initialBallPosY = _graphics.PreferredBackBufferHeight - 44;
+            initialBallPosX = barCollision.X;
+            initialBallPosY = barCollision.Y - 5;
             // posizione iniziale barra
 
             // velocità barra
@@ -74,7 +82,8 @@ namespace ArkanoidCopycat
             spriteFont = Content.Load<SpriteFont>("File");
 
             barCollision = new Rectangle(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight - barTexture.Width, barTexture.Width, barTexture.Height);
-            ballCollision = new Rectangle(initialBallPosX, initialBallPosY - ballTexture.Height, ballTexture.Width, ballTexture.Height); // da cambiare quando si avrà la barra
+            ballCollision = new Rectangle(barCollision.X, barCollision.Y - 5, ballTexture.Width, ballTexture.Height); // da cambiare quando si avrà la barra
+            
         }
 
         protected override void Update(GameTime gameTime)
@@ -105,6 +114,7 @@ namespace ArkanoidCopycat
                 ballCollision.X = initialBallPosX;
                 ballCollision.Y = initialBallPosY;
                 lives--;
+                Restart();
             }
             if (barCollision.Intersects(ballCollision))
             {
