@@ -88,9 +88,9 @@ namespace ArkanoidCopycat
 
             spriteFont = Content.Load<SpriteFont>("File");
 
-            barCollision = new Rectangle(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight - barTexture.Width, barTexture.Width, barTexture.Height);
-            ballCollision = new Rectangle(barCollision.X, barCollision.Y - 5, ballTexture.Width, ballTexture.Height); // da cambiare quando si avrà la barra
-            
+
+            barCollision = new Rectangle(_graphics.PreferredBackBufferWidth / 2 - barTexture.Width, _graphics.PreferredBackBufferHeight, barTexture.Width, barTexture.Height);
+            ballCollision = new Rectangle(initialBallPosX, initialBallPosY - ballTexture.Height, ballTexture.Width, ballTexture.Height); // da cambiare quando si avrà la barra
         }
 
         protected override void Update(GameTime gameTime)
