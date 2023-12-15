@@ -38,6 +38,7 @@ namespace ArkanoidCopycat
         }
         public void Restart()
         {
+            
             barCollision.X = _graphics.PreferredBackBufferWidth / 2;
             ballCollision.X = barCollision.X + ballTexture.Width;
             ballCollision.Y = barCollision.Y;
