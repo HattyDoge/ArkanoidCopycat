@@ -1,14 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Threading;
 
 namespace ArkanoidCopycat
 {
     public class Game1 : Game
     {
         abstract class Collision
-        { 
+        {
 
         }
         class Cube : Collision
@@ -32,19 +31,15 @@ namespace ArkanoidCopycat
         Rectangle barCollision;
         int barSpeed;
         bool check = false;
-        public void Sleep()
-        {
-            
-        }
+
         public void Restart()
         {
+
+            lives--;
             barCollision.X = _graphics.PreferredBackBufferWidth / 2;
             ballCollision.X = barCollision.X + ballTexture.Width;
             ballCollision.Y = barCollision.Y;
             lives--;
-            
-          
-           
         }
         SpriteFont spriteFont;
         public Game1()
@@ -87,9 +82,9 @@ namespace ArkanoidCopycat
 
             spriteFont = Content.Load<SpriteFont>("File");
 
+            barCollision = new Rectangle(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight - barTexture.Width, barTexture.Width, barTexture.Height);
+            ballCollision = new Rectangle(barCollision.X, barCollision.Y - 5, ballTexture.Width, ballTexture.Height); // da cambiare quando si avrà la barra
 
-            barCollision = new Rectangle(_graphics.PreferredBackBufferWidth / 2 - barTexture.Width, _graphics.PreferredBackBufferHeight, barTexture.Width, barTexture.Height);
-            ballCollision = new Rectangle(initialBallPosX, initialBallPosY - ballTexture.Height, ballTexture.Width, ballTexture.Height); // da cambiare quando si avrà la barra
         }
 
         protected override void Update(GameTime gameTime)
