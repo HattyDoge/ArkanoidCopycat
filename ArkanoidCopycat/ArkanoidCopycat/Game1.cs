@@ -7,7 +7,9 @@ namespace ArkanoidCopycat
     public class Game1 : Game
     {
         abstract class Collision
-        { }
+        { 
+
+        }
         class Cube : Collision
         { }
         class PlayerBar : Collision
@@ -44,14 +46,14 @@ namespace ArkanoidCopycat
         {
 
             // TODO: Add your initialization logic here
-            _graphics.PreferredBackBufferHeight = 700;
+            _graphics.PreferredBackBufferHeight = 500;
             _graphics.PreferredBackBufferWidth = 400;
 
             _graphics.ApplyChanges();
             ballMovement.Y = ballSpeed;
 
             initialBallPosX = _graphics.PreferredBackBufferWidth / 2;
-            initialBallPosY = _graphics.PreferredBackBufferHeight - 46;
+            initialBallPosY = _graphics.PreferredBackBufferHeight - 44;
             // posizione iniziale barra
 
             // velocità barra
@@ -71,7 +73,7 @@ namespace ArkanoidCopycat
 
             spriteFont = Content.Load<SpriteFont>("File");
 
-            barCollision = new Rectangle(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight - 40, barTexture.Width, barTexture.Height);
+            barCollision = new Rectangle(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight - barTexture.Width, barTexture.Width, barTexture.Height);
             ballCollision = new Rectangle(initialBallPosX, initialBallPosY - ballTexture.Height, ballTexture.Width, ballTexture.Height); // da cambiare quando si avrà la barra
         }
 
@@ -104,7 +106,7 @@ namespace ArkanoidCopycat
                 ballCollision.Y = initialBallPosY;
                 lives--;
             }
-            if (ballCollision.Y + ballCollision.Height >= barCollision.Y && ballCollision.X >= barCollision.X)
+            if (barCollision.Intersects(ballCollision))
             {
                 ballMovement.Y = -ballMovement.Y;
                 ballCollision.Y += (int)ballMovement.Y;
