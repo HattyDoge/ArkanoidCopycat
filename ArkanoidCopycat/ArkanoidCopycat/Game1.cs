@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 
-namespace Arkanoid
+namespace ArkanoidCopycat
 {
     public class Game1 : Game
     {
@@ -44,8 +44,8 @@ namespace Arkanoid
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // caricamento texture barra e pallina
-            barTexture = Content.Load<Texture2D>("arkanoid_bar");
-            ballTexture = Content.Load<Texture2D>("arkanoid_ball");
+            barTexture = Content.Load<Texture2D>("bar_arkanoid_full");
+            ballTexture = Content.Load<Texture2D>("ball_arkanoid_full");
 
             // posizione iniziale barra e pallina
             barPosition = new Vector2(_graphics.PreferredBackBufferWidth / 2 - barTexture.Width / 2, _graphics.PreferredBackBufferHeight - barTexture.Height);
@@ -90,10 +90,13 @@ namespace Arkanoid
                 barPosition.Y = barTexture.Height / 100;
             }
 
-            // movimento pallina
-            if (kstate.IsKeyDown(Keys.Space))
+            // collisioni barra
+            if (ballPosition.X /*+ ballSize*/ > barPosition.X && 
+                ballPosition.X < barPosition.X + barTexture.Width && 
+                ballPosition.Y /*+ ballSize*/ > barPosition.Y && 
+                ballPosition.Y < barPosition.Y + barTexture.Height)
             {
-                
+                ballSpeed = -ballSpeed;
             }
 
             // bordi pallina
