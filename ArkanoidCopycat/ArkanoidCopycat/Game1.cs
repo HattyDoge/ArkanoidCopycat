@@ -32,13 +32,19 @@ namespace ArkanoidCopycat
         Rectangle barCollision;
         int barSpeed;
         bool check = false;
-        
+        public void Sleep()
+        {
+            
+        }
         public void Restart()
         {
             barCollision.X = _graphics.PreferredBackBufferWidth / 2;
-            Thread.Sleep(10000);
-            ballCollision.X = barCollision.X+ballTexture.Width;
+            ballCollision.X = barCollision.X + ballTexture.Width;
             ballCollision.Y = barCollision.Y;
+            lives--;
+            
+          
+           
         }
         SpriteFont spriteFont;
         public Game1()
@@ -111,9 +117,7 @@ namespace ArkanoidCopycat
             }
             else
             {
-                ballCollision.X = initialBallPosX;
-                ballCollision.Y = initialBallPosY;
-                lives--;
+
                 Restart();
             }
             if (barCollision.Intersects(ballCollision))
