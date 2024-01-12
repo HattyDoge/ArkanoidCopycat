@@ -60,6 +60,8 @@ namespace ArkanoidCopycat
         Texture2D playerBarTexture;
         Texture2D ballTexture;
         Texture2D backgroundTexture;
+        Texture2D heartTextureAlive;
+        Texture2D heartTextureDead;
         PlayerBar playerBar;
         bool restart = false;
         Ball ball;
@@ -98,7 +100,8 @@ namespace ArkanoidCopycat
             ballTexture = Content.Load<Texture2D>("ball_arkanoid_full");
             playerBarTexture = Content.Load<Texture2D>("bar_arkanoid_full");
             backgroundTexture = Content.Load<Texture2D>("background");
-
+            heartTextureDead = Content.Load<Texture2D>("hear_arkanoid_dead");
+            heartTextureAlive = Content.Load<Texture2D>("hear_arkanoid_alive");
 
             playerBar = new PlayerBar(new Rectangle(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 6 * 5, playerBarTexture.Width, playerBarTexture.Height));
             ball = new Ball(new Rectangle(playerBar.X + playerBarTexture.Width / 2 - ballTexture.Width / 2, playerBar.Y - ballTexture.Height, ballTexture.Width, ballTexture.Height)); // da cambiare quando si avrà la barra
