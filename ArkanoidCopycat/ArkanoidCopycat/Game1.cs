@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 // Code by HattyDoge
 namespace ArkanoidCopycat
@@ -36,8 +38,9 @@ namespace ArkanoidCopycat
         }
         class Ball : Collision
         {
-            public Vector2 ballMovement = new Vector2(2, 2);
+            public Vector2 ballMovement = new Vector2(5, 5);
             Rectangle ballCollision;
+            public int numberDetection = 0;
             public Rectangle BallCollision { get { return ballCollision; } set { ballCollision = value; } }
             public Ball() { }
             public Ball(Rectangle rectangle) { ballCollision = rectangle; }
@@ -102,10 +105,9 @@ namespace ArkanoidCopycat
             backgroundTexture = Content.Load<Texture2D>("background");
             heartTextureDead = Content.Load<Texture2D>("hear_arkanoid_dead");
             heartTextureAlive = Content.Load<Texture2D>("hear_arkanoid_alive");
-
-            playerBar = new PlayerBar(new Rectangle(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 6 * 5, playerBarTexture.Width, playerBarTexture.Height));
+            
+            playerBar = new PlayerBar(new Rectangle(_graphics.PreferredBackBufferWidth / 2 - playerBarTexture.Width / 2, _graphics.PreferredBackBufferHeight / 20 * 19, playerBarTexture.Width, playerBarTexture.Height));
             ball = new Ball(new Rectangle(playerBar.X + playerBarTexture.Width / 2 - ballTexture.Width / 2, playerBar.Y - ballTexture.Height, ballTexture.Width, ballTexture.Height)); // da cambiare quando si avrà la barra
-
         }
         void CollisionDetection()
         {
@@ -125,20 +127,25 @@ namespace ArkanoidCopycat
             }
             #endregion
 
-            if (ball.CollisionDetected(playerBar.PlayerBarCollision))
+            if (ball.CollisionDetected(playerBar.PlayerBarCollision) && ball.numberDetection == 0)
             {
-                if (playerBar.X >= ball.X + ball.BallCollision.Width && ball.X < playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 1)
+                if (playerBar.X <= ball.X + ball.BallCollision.Width && ball.X < playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 1)
                 {
                     ball.ballMovement.Y = -ball.ballMovement.Y;
                     ball.ballMovement.X = -ball.ballMovement.X;
                 }
-                else if (playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 1 > ball.X + ball.BallCollision.Width && ball.X < playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 2)
+                else if (playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 1 <= ball.X + ball.BallCollision.Width && ball.X <= playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 2)
                     ball.ballMovement.Y = -ball.ballMovement.Y;
-                else if (playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 2 > ball.X + ball.BallCollision.Width && ball.X < playerBar.X + playerBar.PlayerBarCollision.Width)
+                else if (playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 2 < ball.X + ball.BallCollision.Width && ball.X <= playerBar.X + playerBar.PlayerBarCollision.Width)
                 { 
                     ball.ballMovement.Y = -ball.ballMovement.Y;
-                    ball.ballMovement.X = -ball.ballMovement.X;
+                    ball.ballMovement.X = - ball.ballMovement.X;
                 }
+                ball.numberDetection++;
+            }
+            else
+            {
+                ball.numberDetection = 0;
             }
         }
         void Movement(KeyboardState keyboardState)
@@ -155,7 +162,7 @@ namespace ArkanoidCopycat
             {
                 playerBar.X -= playerBar.playerBarSpeed;
             }
-            if (keyboardState.IsKeyDown(Keys.Space))
+            if (keyboardState.IsKeyDown(Keys.Up))
             {
                 restart = false;
             }
