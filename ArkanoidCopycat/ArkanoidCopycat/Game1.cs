@@ -127,8 +127,18 @@ namespace ArkanoidCopycat
 
             if (ball.CollisionDetected(playerBar.PlayerBarCollision))
             {
-                if (playerBar.X / 3 * 2 < ball.X && ball.X > playerBar.X / 3 * 1)
-                ball.ballMovement.Y = -ball.ballMovement.Y;
+                if (playerBar.X >= ball.X + ball.BallCollision.Width && ball.X < playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 1)
+                {
+                    ball.ballMovement.Y = -ball.ballMovement.Y;
+                    ball.ballMovement.X = -ball.ballMovement.X;
+                }
+                else if (playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 1 > ball.X + ball.BallCollision.Width && ball.X < playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 2)
+                    ball.ballMovement.Y = -ball.ballMovement.Y;
+                else if (playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 2 > ball.X + ball.BallCollision.Width && ball.X < playerBar.X + playerBar.PlayerBarCollision.Width)
+                { 
+                    ball.ballMovement.Y = -ball.ballMovement.Y;
+                    ball.ballMovement.X = -ball.ballMovement.X;
+                }
             }
         }
         void Movement(KeyboardState keyboardState)
@@ -150,9 +160,9 @@ namespace ArkanoidCopycat
                 restart = false;
             }
             //bordi
-            if (playerBar.X > _graphics.PreferredBackBufferWidth - 24)
+            if (playerBar.X > _graphics.PreferredBackBufferWidth - playerBarTexture.Width)
             {
-                playerBar.X = _graphics.PreferredBackBufferWidth - 24;
+                playerBar.X = _graphics.PreferredBackBufferWidth - playerBarTexture.Width;
             }
             else if (playerBar.X < 0)
             {
