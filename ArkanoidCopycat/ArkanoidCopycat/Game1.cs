@@ -68,8 +68,26 @@ namespace ArkanoidCopycat
         PlayerBar playerBar;
         bool restart = false;
         Ball ball;
+        private Texture2D blockTexture;
+        private Block[,] blocks;
 
-        
+        class Block : Collision
+        {
+            Rectangle blockCollision;
+            public Rectangle BlockCollision { get { return blockCollision; } set { blockCollision = value; } }
+            public bool IsActive { get; set; }
+
+            public Block(Rectangle rectangle)
+            {
+                blockCollision = rectangle;
+                IsActive = true;
+            }
+
+            public override bool CollisionDetected(Rectangle collision)
+            {
+                return IsActive && blockCollision.Intersects(collision);
+            }
+        }
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -98,7 +116,10 @@ namespace ArkanoidCopycat
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            blockTexture = Content.Load<Texture2D>("prova2");
+            InitializeBlocks();
 
+            base.LoadContent();
             // TODO: use this.Content to load your game content here
             ballTexture = Content.Load<Texture2D>("ball_arkanoid_full");
             playerBarTexture = Content.Load<Texture2D>("bar_arkanoid_full");
@@ -148,6 +169,49 @@ namespace ArkanoidCopycat
                 ball.numberDetection = 0;
             }
         }
+        void InitializeBlocks()
+        {
+            int rows = 5;
+            int columns = 13;
+            int blockWidth = blockTexture.Width;
+            int blockHeight = blockTexture.Height;
+            blocks = new Block[rows, columns];
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    int x = j * (blockWidth + 2); 
+                    int y = i * (blockHeight + 2);
+                    blocks[i, j] = new Block(new Rectangle(x, y, blockWidth, blockHeight));
+                }
+            }
+        }
+
+        void DrawBlocks()
+        {
+            foreach (var block in blocks)
+            {
+                if (block.IsActive)
+                {
+                    _spriteBatch.Draw(blockTexture, block.BlockCollision, Color.White);
+                }
+            }
+        }
+
+        void HandleBlockCollision()
+        {
+            foreach (var block in blocks)
+            {
+                if (block.CollisionDetected(ball.BallCollision))
+                {
+                    block.IsActive = false;
+                    ball.ballMovement.Y = -ball.ballMovement.Y; // Inverti la direzione della pallina
+                }
+            }
+        }
+
+
         void Movement(KeyboardState keyboardState)
         {
             CollisionDetection();
@@ -190,6 +254,8 @@ namespace ArkanoidCopycat
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             var keyboardState = Keyboard.GetState();
+            HandleBlockCollision();
+
             // TODO: Add your update logic here
             Movement(keyboardState);
 
@@ -203,7 +269,10 @@ namespace ArkanoidCopycat
             _spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
             _spriteBatch.Draw(ballTexture, ball.BallCollision, Color.White);
             _spriteBatch.Draw(playerBarTexture, playerBar.PlayerBarCollision, Color.White);
-            
+            _spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
+            _spriteBatch.Draw(ballTexture, ball.BallCollision, Color.White);
+            _spriteBatch.Draw(playerBarTexture, playerBar.PlayerBarCollision, Color.White);
+            DrawBlocks();
             // TODO: Add your drawing code here
             _spriteBatch.End();
 
