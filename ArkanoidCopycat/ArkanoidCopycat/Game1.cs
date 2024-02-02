@@ -109,7 +109,7 @@ namespace ArkanoidCopycat
         }
         void CollisionDetection()
         {
-
+            #region palla contro i bordi
             if (ball.X >= _graphics.PreferredBackBufferWidth - ball.BallCollision.Width || ball.X <= 0)
             {
                 ball.ballMovement.X = -ball.ballMovement.X;
@@ -123,9 +123,11 @@ namespace ArkanoidCopycat
             {
                 Restart();
             }
+            #endregion
 
             if (ball.CollisionDetected(playerBar.PlayerBarCollision))
             {
+                if (playerBar.X / 3 * 2 < ball.X && ball.X > playerBar.X / 3 * 1)
                 ball.ballMovement.Y = -ball.ballMovement.Y;
             }
         }
