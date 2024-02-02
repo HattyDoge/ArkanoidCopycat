@@ -16,10 +16,17 @@ namespace ArkanoidCopycat
         class Cube : Collision
         {
             Rectangle cubeCollision;
-            public Rectangle CubeCollision { get { return CubeCollision; } set { CubeCollision = value; } }
+            public Rectangle CubeCollision { get { return cubeCollision; } set { cubeCollision = value; } }
             public override bool CollisionDetected(Rectangle collision)
             {
-                return cubeCollision.Intersects(collision);
+                return IsActive && cubeCollision.Intersects(collision);
+            }
+            public bool IsActive { get; set; }
+
+            public Cube(Rectangle rectangle)
+            {
+                CubeCollision = rectangle;
+                IsActive = true;
             }
         }
         class PlayerBar : Collision
@@ -69,25 +76,9 @@ namespace ArkanoidCopycat
         bool restart = false;
         Ball ball;
         private Texture2D blockTexture;
-        private Block[,] blocks;
+        private Cube[,] blocks;
 
-        class Block : Collision
-        {
-            Rectangle blockCollision;
-            public Rectangle BlockCollision { get { return blockCollision; } set { blockCollision = value; } }
-            public bool IsActive { get; set; }
 
-            public Block(Rectangle rectangle)
-            {
-                blockCollision = rectangle;
-                IsActive = true;
-            }
-
-            public override bool CollisionDetected(Rectangle collision)
-            {
-                return IsActive && blockCollision.Intersects(collision);
-            }
-        }
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -97,7 +88,7 @@ namespace ArkanoidCopycat
         public void Restart()
         {
             ball.X = playerBar.X + playerBarTexture.Width / 2 - ballTexture.Width / 2;
-            ball.Y = playerBar.Y - playerBarTexture.Height / 2 - ballTexture.Height / 2;
+            ball.Y = playerBar.Y - ball.BallCollision.Height;
             restart = true;
             lives--;
         }
@@ -105,8 +96,8 @@ namespace ArkanoidCopycat
         {
             // TODO: Add your initialization logic here
             
-            _graphics.PreferredBackBufferHeight = 569;
-            _graphics.PreferredBackBufferWidth = 400;
+            _graphics.PreferredBackBufferHeight = 512;
+            _graphics.PreferredBackBufferWidth = 356;
             _graphics.ApplyChanges();
 
 
@@ -133,12 +124,13 @@ namespace ArkanoidCopycat
         void CollisionDetection()
         {
             #region palla contro i bordi
-            if (ball.X >= _graphics.PreferredBackBufferWidth - ball.BallCollision.Width || ball.X <= 0)
+            //parte laterale
+            if (ball.X >= _graphics.PreferredBackBufferWidth - ball.BallCollision.Width - 20 || ball.X <= 0 + 20)
             {
                 ball.ballMovement.X = -ball.ballMovement.X;
             }
-
-            if (ball.Y + ball.ballMovement.Y <= 0)
+            //parte inferiore e superiore
+            if (ball.Y + ball.ballMovement.Y <= 0 + 90)
             {
                 ball.ballMovement.Y = -ball.ballMovement.Y;
             }
@@ -148,25 +140,30 @@ namespace ArkanoidCopycat
             }
             #endregion
 
-            if (ball.CollisionDetected(playerBar.PlayerBarCollision) && ball.numberDetection == 0)
+            if (ball.CollisionDetected(playerBar.PlayerBarCollision))
             {
                 if (playerBar.X <= ball.X + ball.BallCollision.Width && ball.X < playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 1)
                 {
-                    ball.ballMovement.Y = -ball.ballMovement.Y;
-                    ball.ballMovement.X = -ball.ballMovement.X;
+                    if (ball.ballMovement.X < 0)
+                        ball.ballMovement.Y = -ball.ballMovement.Y;
+                    else
+                    {
+                        ball.ballMovement.Y = -ball.ballMovement.Y;
+                        ball.ballMovement.X = -ball.ballMovement.X;
+                    }
                 }
                 else if (playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 1 <= ball.X + ball.BallCollision.Width && ball.X <= playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 2)
                     ball.ballMovement.Y = -ball.ballMovement.Y;
                 else if (playerBar.X + playerBar.PlayerBarCollision.Width / 3 * 2 < ball.X + ball.BallCollision.Width && ball.X <= playerBar.X + playerBar.PlayerBarCollision.Width)
-                { 
-                    ball.ballMovement.Y = -ball.ballMovement.Y;
-                    ball.ballMovement.X = - ball.ballMovement.X;
+                {
+                    if (ball.ballMovement.X > 0)
+                        ball.ballMovement.Y = -ball.ballMovement.Y;
+                    else
+                    {
+                        ball.ballMovement.Y = -ball.ballMovement.Y;
+                        ball.ballMovement.X = -ball.ballMovement.X;
+                    }
                 }
-                ball.numberDetection++;
-            }
-            else
-            {
-                ball.numberDetection = 0;
             }
         }
         void InitializeBlocks()
@@ -175,7 +172,7 @@ namespace ArkanoidCopycat
             int columns = 13;
             int blockWidth = blockTexture.Width;
             int blockHeight = blockTexture.Height;
-            blocks = new Block[rows, columns];
+            blocks = new Cube[rows, columns];
 
             for (int i = 0; i < rows; i++)
             {
@@ -183,7 +180,7 @@ namespace ArkanoidCopycat
                 {
                     int x = j * (blockWidth + 2); 
                     int y = i * (blockHeight + 2);
-                    blocks[i, j] = new Block(new Rectangle(x, y, blockWidth, blockHeight));
+                    blocks[i, j] = new Cube(new Rectangle(x, y, blockWidth, blockHeight));
                 }
             }
         }
@@ -194,7 +191,7 @@ namespace ArkanoidCopycat
             {
                 if (block.IsActive)
                 {
-                    _spriteBatch.Draw(blockTexture, block.BlockCollision, Color.White);
+                    _spriteBatch.Draw(blockTexture, block.CubeCollision, Color.White);
                 }
             }
         }
@@ -206,7 +203,10 @@ namespace ArkanoidCopycat
                 if (block.CollisionDetected(ball.BallCollision))
                 {
                     block.IsActive = false;
-                    ball.ballMovement.Y = -ball.ballMovement.Y; // Inverti la direzione della pallina
+                    //controlla se tocca un lato sinistro o destro
+                    if(block.CubeCollision.Bottom < ball.Y && ball.Y < block.CubeCollision.Top)
+                    { 
+                    }
                 }
             }
         }
@@ -219,30 +219,35 @@ namespace ArkanoidCopycat
             if (keyboardState.IsKeyDown(Keys.Right))
             {
                 playerBar.X += playerBar.playerBarSpeed;
+                if (restart)
+                    ball.ballMovement.X = 5;
             }
 
             // movimento a sinistra
             if (keyboardState.IsKeyDown(Keys.Left))
             {
                 playerBar.X -= playerBar.playerBarSpeed;
+                if (restart)
+                    ball.ballMovement.X = -5;
             }
             if (keyboardState.IsKeyDown(Keys.Up))
             {
                 restart = false;
+                ball.ballMovement.Y = -5;
             }
             //bordi
-            if (playerBar.X > _graphics.PreferredBackBufferWidth - playerBarTexture.Width)
+            if (playerBar.X > _graphics.PreferredBackBufferWidth - playerBarTexture.Width - 20)
             {
                 playerBar.X = _graphics.PreferredBackBufferWidth - playerBarTexture.Width;
             }
-            else if (playerBar.X < 0)
+            else if (playerBar.X < 0 + 20)
             {
                 playerBar.X = 0;
             }
             if (restart)
             {
                 ball.X = playerBar.X + playerBarTexture.Width / 2 - ballTexture.Width / 2;
-                ball.Y = playerBar.Y - playerBarTexture.Height / 2 - ballTexture.Height / 2;
+                ball.Y = playerBar.Y - ball.BallCollision.Height;
             }
             else
             {
